@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"slices"
 	"strconv"
 )
@@ -19,12 +20,12 @@ func convertToInts(args []string) []int {
 
 		fNum, err := strconv.ParseFloat(s, 64)
 		if err == nil {
-			fmt.Println("Warning: at least one of your numbers is not an Integer! All numbers have been automatically converted to integers (before runnig am operation)!")
+			fmt.Println("Warning: at least one of your numbers is not an Integer! All numbers have been automatically converted to integers (before running an operation)!")
 			result = append(result, int(fNum))
 			continue
 		}
 
-		fmt.Printf("Warning: a non-numeric sequence has been omitted: '%s'\n", s)
+		_, _ = fmt.Fprintf(os.Stderr, "Warning: a non-numeric sequence has been detected, try again: '%s'\n", s)
 		os.Exit(1)
 	}
 
@@ -41,9 +42,7 @@ func Add(args []int) int {
 }
 
 func Subtract(args []int) int {
-	result := args[0] - args[1]
-
-	return result
+	return args[0] - args[1]
 }
 
 func Multiply(args []int) int {
@@ -57,7 +56,7 @@ func Multiply(args []int) int {
 
 func Divide(args []int) int {
 	if args[1] == 0 {
-		fmt.Println("YOU CANNOT DIVIDE BY ZERO!!!")
+		_, _ = fmt.Fprintln(os.Stderr, "YOU CANNOT DIVIDE BY ZERO!!!")
 		os.Exit(1)
 	}
 
@@ -70,12 +69,18 @@ func main() {
 	args := os.Args[1:]
 	operations := []string{"+", "-", "*", "/"}
 
+	if len(args) <= 2 {
+		progName := filepath.Base(os.Args[0])
+		_, _ = fmt.Fprintf(os.Stderr, "Usage: ./%s <number1> <number2> [<number3> ...] <operator>\n", progName)
+		os.Exit(1)
+	}
+
 	if !slices.Contains(operations, args[len(args)-1]) {
-		fmt.Println("You have not provdied an operation or your operation is not supported by this program!")
-		fmt.Println("If you've tried to multiply ('*') - try again by enclosing the multiplication sign in single quotes (“*”) or by preceding it with a backslash (\\*)")
+		_, _ = fmt.Fprintln(os.Stderr, "You have not provided an operation or your operation is not supported by this program!")
+		_, _ = fmt.Fprintln(os.Stderr, "If you've tried to multiply ('*') - try again by enclosing the multiplication sign in single quotes (“*”) or by preceding it with a backslash (\\*)")
 		os.Exit(1)
 	} else if ((args[len(args)-1] == "-") || (args[len(args)-1] == "/")) && (len(args) > 3) {
-		fmt.Println("You have provdied too many arguments for this type of operation!")
+		_, _ = fmt.Fprintln(os.Stderr, "You have provided too many arguments for this type of operation!")
 		os.Exit(1)
 	}
 
