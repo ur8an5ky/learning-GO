@@ -23,15 +23,12 @@ func main() {
 			break
 		}
 
-		line := strings.TrimSpace(scanner.Text())
+		line := strings.ToLower(strings.TrimSpace(scanner.Text()))
 		if line == "" {
 			continue
 		}
 
 		command := strings.SplitN(line, " ", 4)
-		for i := range command {
-			command[i] = strings.ToLower(command[i])
-		}
 
 		if command[0] == "help" {
 			if len(command) == 1 {
@@ -44,6 +41,8 @@ func main() {
 					help.HelpLength()
 				case "weight":
 					help.HelpWeight()
+				default:
+					fmt.Printf("Unknown help topic: %q. Available: temperature, length, weight.\n", command[1])
 				}
 			}
 			continue
@@ -53,29 +52,21 @@ func main() {
 			return
 		}
 
-		category := units.TypeOfCategory(command[1], command[3])
-
-		switch category {
-		case units.CategoryTemperature:
-			result, err := u.ConvertTemperature(command)
-			if err != nil {
-				fmt.Printf("Error while converting unit %q to unit type: %q\n", command, err)
-			}
-			fmt.Printf("%s %s = %g %s\n", command[0], command[1], result, command[3])
-		case units.CategoryLength:
-			result, err := u.ConvertLength(command)
-			if err != nil {
-				fmt.Printf("Error while converting unit %q to unit type: %q\n", command, err)
-			}
-			fmt.Printf("%s %s = %g %s\n", command[0], command[1], result, command[3])
-		case units.CategoryWeight:
-			result, err := u.ConvertWeight(command)
-			if err != nil {
-				fmt.Printf("Error while converting unit %q to unit type: %q\n", command, err)
-			}
-			fmt.Printf("%s %s = %g %s\n", command[0], command[1], result, command[3])
-		case units.CategoryUnknown:
-			fmt.Printf("Unknown help topic: %q. Type 'help' to see available categories.\n", command[1])
+		if len(command) != 4 {
+			fmt.Println("Invalid command. Type 'help' for usage.")
+			continue
 		}
+
+		if command[2] != "to" {
+			fmt.Printf("Expected 'to' as separator, got %q. Type 'help' for usage.\n", command[2])
+			continue
+		}
+
+		result, err := u.Convert(command)
+		if err != nil {
+			fmt.Println("Error:", err)
+			continue
+		}
+		fmt.Printf("%s %s = %g %s\n", command[0], command[1], result, command[3])
 	}
 }

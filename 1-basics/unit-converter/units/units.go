@@ -53,8 +53,7 @@ func bothInMap(m map[string]float64, u1, u2 string) bool {
 	return ok1 && ok2
 }
 
-func TypeOfCategory(unit1, unit2 string) Category {
-	u := NewUnits()
+func (u Units) typeOfCategory(unit1, unit2 string) Category {
 	switch {
 	case bothInMap(u.temperature, unit1, unit2):
 		return CategoryTemperature
@@ -67,14 +66,9 @@ func TypeOfCategory(unit1, unit2 string) Category {
 	}
 }
 
-func (u Units) ConvertTemperature(command []string) (float64, error) {
-	value, err := strconv.ParseFloat(command[0], 64)
-	if err != nil {
-		return 0, fmt.Errorf("invalid number %q: %w", command[0], err)
-	}
-
-	celsius := toCelsius(value, command[1])
-	return fromCelsius(celsius, command[3]), nil
+func (u Units) convertTemperature(value float64, from, to string) (float64, error) {
+	celsius := toCelsius(value, from)
+	return fromCelsius(celsius, to), nil
 }
 
 func toCelsius(value float64, unit string) float64 {
@@ -103,22 +97,31 @@ func fromCelsius(value float64, unit string) float64 {
 	}
 }
 
-func (u Units) ConvertLength(command []string) (float64, error) {
+func (u Units) Convert(command []string) (float64, error) {
 	value, err := strconv.ParseFloat(command[0], 64)
 	if err != nil {
 		return 0, fmt.Errorf("invalid number %q: %w", command[0], err)
 	}
-	unit1, unit2 := u.length[command[1]], u.length[command[3]]
 
-	return value / unit2 * unit1, nil
+	from, to := command[1], command[3]
+	category := u.typeOfCategory(from, to)
+
+	switch category {
+	case CategoryTemperature:
+		return u.convertTemperature(value, from, to)
+	case CategoryLength:
+		return u.convertLength(value, from, to)
+	case CategoryWeight:
+		return u.convertWeight(value, from, to)
+	default:
+		return 0, fmt.Errorf("unknown or mixed units: %q, %q", from, to)
+	}
 }
 
-func (u Units) ConvertWeight(command []string) (float64, error) {
-	value, err := strconv.ParseFloat(command[0], 64)
-	if err != nil {
-		return 0, fmt.Errorf("invalid number %q: %w", command[0], err)
-	}
-	unit1, unit2 := u.weight[command[1]], u.weight[command[3]]
+func (u Units) convertLength(value float64, from, to string) (float64, error) {
+	return value * u.length[from] / u.length[to], nil
+}
 
-	return value / unit2 * unit1, nil
+func (u Units) convertWeight(value float64, from, to string) (float64, error) {
+	return value * u.weight[from] / u.weight[to], nil
 }

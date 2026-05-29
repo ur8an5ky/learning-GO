@@ -33,23 +33,23 @@ func HelpTemperature() {
 
 func HelpLength() {
 	fmt.Println("Length units:")
-	fmt.Println("\tm     metre  (base unit)")
-	fmt.Println("\tkm    kilometre")
-	fmt.Println("\tcm    centimetre")
-	fmt.Println("\tmi    mile")
-	fmt.Println("\tft    foot")
+	fmt.Println("\tm     - metre  (base unit)")
+	fmt.Println("\tkm    - kilometre")
+	fmt.Println("\tcm    - centimetre")
+	fmt.Println("\tmi    - mile")
+	fmt.Println("\tft    - foot")
 	fmt.Println()
 	fmt.Println("Example: 10 km to mi")
 }
 
 func HelpWeight() {
 	fmt.Println("Weight units:")
-	fmt.Println("\tg     gram  (base unit)")
-	fmt.Println("\tkg    kilogram")
-	fmt.Println("\tt     tonne")
-	fmt.Println("\tmg    milligram")
-	fmt.Println("\tlb    pound")
-	fmt.Println("\toz    ounce")
+	fmt.Println("\tg     - gram  (base unit)")
+	fmt.Println("\tkg    - kilogram")
+	fmt.Println("\tt     - tonne")
+	fmt.Println("\tmg    - milligram")
+	fmt.Println("\tlb    - pound")
+	fmt.Println("\toz    - ounce")
 	fmt.Println()
 	fmt.Println("Example: 500 g to lb")
 }
